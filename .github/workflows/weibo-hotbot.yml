@@ -1,0 +1,22 @@
+name: Weibo Hot Bot
+on:
+  schedule:
+    - cron: '0 1 * * *'
+    - cron: '0 6 * * *'
+    - cron: '0 9 * * *'
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+jobs:
+  push-hotbot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install dependencies
+        run: pip install requests
+      - name: Run hot bot
+        env:
+          SENDKEY: ${{ secrets.SENDKEY }}
+        run: python weibo_hotbot.py --sendkey "$SENDKEY" --top 50
