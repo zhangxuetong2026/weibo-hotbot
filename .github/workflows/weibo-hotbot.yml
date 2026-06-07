@@ -1,22 +1,27 @@
-name: Weibo Hot Bot
+name: 微博热榜自动推送
+
 on:
   schedule:
-    - cron: '0 1 * * *'
-    - cron: '0 6 * * *'
-    - cron: '0 9 * * *'
-    - cron: '0 12 * * *'
-  workflow_dispatch:
+    # UTC时间（北京时间 = UTC+8）
+    # 避开 UTC 整点高峰，用非整点分钟数，减少排队延迟
+    - cron: '30 1 * * *'   # 北京 09:30
+    - cron: '30 6 * * *'   # 北京 14:30
+    - cron: '30 9 * * *'   # 北京 17:30
+    - cron: '30 12 * * *'  # 北京 20:30
+  workflow_dispatch:      # 支持手动触发（方便测试）
+
 jobs:
-  push-hotbot:
+  push-weibo-hot:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-      - name: Install dependencies
-        run: pip install requests
-      - name: Run hot bot
-        env:
-          SENDKEY: ${{ secrets.SENDKEY }}
-        run: python weibo_hotbot.py --sendkey "$SENDKEY" --top 50
+          python-version: '3.12'
+
+      - name: 执行热榜推送脚本
+        run: python weibo_hotbot.py --sendkey "${{ secrets.SENDKEY }}" --top 50
